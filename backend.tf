@@ -1,9 +1,9 @@
-# terraform {
-#   cloud {
-#     organization = "ATech"
+terraform {
+  cloud {
+    organization = "ATech"
 
-#     workspaces {
-#       name = "infrastructure"
-#     }
-#   }
-# }
+    workspaces {
+      name = "infrastructure"
+    }
+  }
+}

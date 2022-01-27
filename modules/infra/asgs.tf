@@ -42,7 +42,7 @@ resource "aws_launch_template" "web_lt" {
   image_id      = data.aws_ami.ubuntu.id
   instance_type = var.web_instance_type
   key_name      = var.keypair
-  user_data     = file(base64encode("${path.module}/files/setup-web.sh"))
+  user_data     = base64encode(file("${path.module}/files/setup-web.sh"))
 
   block_device_mappings {
     device_name = "/dev/sda1"
