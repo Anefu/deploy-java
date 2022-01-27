@@ -15,6 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -44,4 +48,4 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file environments/${{ env.GITHUB_REF_NAME }}/terraform.tfvars
+        run: terraform apply -auto-approve -var-file environments/${{ steps.branch-name.outputs.current_branch }}/terraform.tfvars
