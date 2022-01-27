@@ -17,5 +17,5 @@ data "aws_instances" "webservers" {
   }
 }
 output "instances" {
-  value = tolist(data.aws_instances.webservers.public_ips[*])
+  value = [for ip in data.aws_instances.webservers.public_ips[*] : ip]
 }
