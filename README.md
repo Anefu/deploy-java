@@ -9,7 +9,7 @@ Deploys infrastructure to AWS Cloud using Terraform. Uses GitHub Actions Workflo
 - Security groups for web servers and ALB
 
 ## How to Use
-- Create a Terraform cloud account [here] (https://app.terraform.io/)
+- Create a Terraform cloud account [here](https://app.terraform.io/)
 - Create a new Workspace
 - Select **API-driven workflow**
 - Enter workspace name and description
