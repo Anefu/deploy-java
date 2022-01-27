@@ -41,12 +41,12 @@ resource "aws_security_group" "internal_lb" {
 }
 
 resource "aws_security_group_rule" "internal_lb_rule" {
-  from_port         = 80
-  protocol          = "tcp"
-  to_port           = 80
-  type              = "ingress"
+  from_port                = 80
+  protocol                 = "tcp"
+  to_port                  = 80
+  type                     = "ingress"
   source_security_group_id = aws_security_group.public_lb.id
-  security_group_id = aws_security_group.internal_lb.id
+  security_group_id        = aws_security_group.internal_lb.id
 }
 
 resource "aws_security_group" "bastion" {

@@ -8,8 +8,8 @@ resource "aws_launch_template" "nginx_lt" {
   key_name      = var.keypair
 
   user_data = base64encode(templatefile("${path.module}/files/setup-nginx.sh", {
-    alb         = aws_lb.web_lb.dns_name,
-    host        =  "$host"
+    alb  = aws_lb.web_lb.dns_name,
+    host = "$host"
     }
   ))
 

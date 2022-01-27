@@ -28,7 +28,7 @@ resource "aws_lb" "nginx_lb" {
   name               = "Nginx-lb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.public_lb.id]
-  subnets            = [for subnet in aws_subnet.public_subnets[*].id : subnet] 
+  subnets            = [for subnet in aws_subnet.public_subnets[*].id : subnet]
 
   enable_deletion_protection = false
 
@@ -39,10 +39,10 @@ resource "aws_lb" "nginx_lb" {
 
 resource "aws_lb" "web_lb" {
   name               = "Web-lb"
-  internal           = true 
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.internal_lb.id]
-  subnets            = [for subnet in aws_subnet.private_subnets[*].id : subnet] 
+  subnets            = [for subnet in aws_subnet.private_subnets[*].id : subnet]
 
   enable_deletion_protection = false
 

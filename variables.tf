@@ -31,6 +31,6 @@ variable "web_max" {
 }
 
 variable "keypair" {
-  type = string
+  type        = string
   description = "Name of AWS Key Pair to use for SSH"
 }
