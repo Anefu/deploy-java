@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "internal_lb_rule" {
   protocol                 = "tcp"
   to_port                  = 80
   type                     = "ingress"
-  source_security_group_id = aws_security_group.public_lb.id
+  source_security_group_id = aws_security_group.nginx.id
   security_group_id        = aws_security_group.internal_lb.id
 }
 

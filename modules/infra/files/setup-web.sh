@@ -25,5 +25,7 @@ server {
 }
 EOF
 
+sed -i -e "s/include \/etc\/nginx\/sites\-enabled\/\*;/#include \/etc\/nginx\/sites-enabled\/\*;/" /etc/nginx/nginx.conf
+
 systemctl restart nginx
 systemctl enable nginx
