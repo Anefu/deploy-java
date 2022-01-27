@@ -17,5 +17,5 @@ data "aws_instances" "webservers" {
   }
 }
 output "instances" {
-  value = [for ip in data.aws_instances.webservers.public_ips[*] : ip]
+  value = [for ip in data.aws_instances.webservers.private_ips[*] : ip]
 }
