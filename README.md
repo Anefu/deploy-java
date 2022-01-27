@@ -9,6 +9,7 @@ Deploys infrastructure to AWS Cloud using Terraform. Uses GitHub Actions Workflo
 - Security groups for web servers and ALB
 
 ## How to Use
+- Replace the **keypair** variable in the environments/\<current-env\>/terraform.tfvars file with the name of an AWS keypair in the same region you want to deploy resources to
 - Create a Terraform cloud account [here](https://app.terraform.io/)
 - Create a new Workspace
 - Select **API-driven workflow**
