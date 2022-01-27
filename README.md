@@ -9,7 +9,7 @@ Deploys infrastructure to AWS Cloud using Terraform. Uses GitHub Actions Workflo
 - Security groups for web servers and ALB
 
 ## How to Use
-- Create a Terraform cloud account !(here)[https://app.terraform.io/]
+- Create a Terraform cloud account ![here](https://app.terraform.io/)
 - Create a new Workspace
 - Select **API-driven workflow**
 - Enter workspace name and description
@@ -19,11 +19,15 @@ Deploys infrastructure to AWS Cloud using Terraform. Uses GitHub Actions Workflo
 - Click on **User settings**
 - On the left pane, click Tokens
 - Click **Create an API token**
-- Enter a description and click **Create API Token**
+- Enter a description and click **Create API Token** ![](.imgs/token.png)
 - Copy the generated token and head back to this repo on GitHub
 - Click **Settings**, by the left, click **Secrets**
 - Under Secrets, select Actions
 - Click **New repository secret**
 - For **Name**, enter **TERRAFORM_API_TOKEN**
-- For **Value**, paste in the copied token from Terraform Cloud
+- For **Value**, paste in the copied token from Terraform Cloud ![](.imgs/secrets.png)
+- On Terraform Cloud, click on Variables
+- Under Workspace Variables, click **Add variable**
+- Enter **AWS_ACCESS_KEY_ID** as key and your AWS access key id as value, check the sensitive box and also the **Environment Variable** radio button
+- Repeat the same steps for your AWS secret access key as shown here ![](.imgs/vars.png)
 - Push the code, and wait for deployment to complete
