@@ -69,6 +69,9 @@ resource "aws_launch_template" "web_lt" {
 }
 
 resource "aws_autoscaling_group" "nginx_asg" {
+  depends_on = [
+    aws_internet_gateway.ig
+  ]
   name                = "Nginx-ASG"
   desired_capacity    = 1
   max_size            = 3
@@ -83,6 +86,9 @@ resource "aws_autoscaling_group" "nginx_asg" {
 }
 
 resource "aws_autoscaling_group" "web_asg" {
+  depends_on = [
+    aws_nat_gateway.nat
+  ]
   name                = "Web-ASG"
   desired_capacity    = var.web_min
   max_size            = var.web_max
