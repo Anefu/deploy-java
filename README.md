@@ -7,6 +7,7 @@ Deploys infrastructure to AWS Cloud using Terraform. Uses GitHub Actions Workflo
 - Launch template for web servers
 - Auto scaling group for web servers
 - Security groups for web servers and ALB
+![](.imgs/archi.jpg)
 
 ## How to Use
 - Replace the **keypair** variable in the environments/\<current-env\>/terraform.tfvars file with the name of an AWS keypair in the same region you want to deploy resources to
