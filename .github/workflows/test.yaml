@@ -42,7 +42,7 @@ jobs:
     - name: Build image
       run: |
         echo IMAGE_TAG=$GCR_URL:$( git rev-parse --short HEAD ) >> $GITHUB_ENV
-        docker build -t $IMAGE_TAG .
+        docker build -t $IMAGE_TAG .  
     
     - name: Scan image
       run: echo 'Scanning'
