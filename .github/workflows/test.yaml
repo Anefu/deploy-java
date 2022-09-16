@@ -9,7 +9,7 @@ on:
 jobs:
 
   unit-tests:
-    if: github.event_name == 'pull_request' && !(contains( branches , ${GITHUB_REF##*/}))
+    if: github.event_name == 'pull_request' && !(contains('develop,qa,uat,prod', ${GITHUB_REF##*/}))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains([develop,qa,uat,prod], ${GITHUB_REF##*/})
+    if: github.event_name == 'push' && contains('develop,qa,uat,prod', ${GITHUB_REF##*/})
     steps: 
     - uses: actions/checkout@v3
 
