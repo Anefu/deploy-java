@@ -22,7 +22,7 @@ jobs:
           dev:
             - 'environments/dev/**'
           prod:
-            - 'environments/staging/**'
+            - 'environments/prod/**'
 
   # JOB to deploy dev
   dev:
