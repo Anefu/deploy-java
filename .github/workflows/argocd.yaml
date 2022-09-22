@@ -28,7 +28,7 @@ jobs:
   # JOB to deploy dev
   dev:
     container:
-      image: kubectl:1.24
+      image: bitnami/kubectl:1.24
     needs: changes
     if: ${{ needs.changes.outputs.dev == 'true' }}
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
   # JOB to deploy prod
   prod:
     container:
-        image: kubectl:1.24
+        image: bitnami/kubectl:1.24
     needs: changes
     if: ${{ needs.changes.outputs.prod == 'true' }}
     runs-on: ubuntu-latest
