@@ -2,6 +2,8 @@ name: ArgoCD
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "environments/**"
 
@@ -22,7 +24,7 @@ jobs:
           dev:
             - 'environments/dev/**'
           prod:
-            - 'environments/prod/**'
+            - 'environments/sta/**'
 
   # JOB to deploy dev
   dev:
