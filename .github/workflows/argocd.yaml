@@ -24,7 +24,7 @@ jobs:
           dev:
             - 'environments/dev/**'
           prod:
-            - 'environments/sta/**'
+            - 'environments/prod/**'
 
   # JOB to deploy dev
   dev:
