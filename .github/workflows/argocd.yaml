@@ -2,8 +2,9 @@ name: ArgoCD
 
 on:
   push:
-    branches:
-      - prod
+    paths:
+      - "environments/dev/**"
+      - "environments/prod/**"
 
 jobs:
   # JOB to run change detection
@@ -29,7 +30,7 @@ jobs:
     container:
       image: kubectl:1.24
     needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+    if: ${{ needs.changes.outputs.dev == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -41,7 +42,7 @@ jobs:
     container:
         image: kubectl:1.24
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.prod == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
