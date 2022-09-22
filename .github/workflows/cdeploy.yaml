@@ -1,0 +1,215 @@
+name: Build, deploy to QA-Y
+on:
+  push:
+    paths-ignore:
+      - '.github/workflows/**'
+    branches: [ "develop", "qa", "uat" ]
+  pull_request:
+    branches: [ "feature.*", "bugfix.*" ]
+
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_SHARED }}
+  GITHUB_SHA: ${{ github.sha }}
+  GITHUB_REF: ${{ github.ref }}
+  ORG: roava.io/services
+  IMAGE: ms.messaging
+  REGISTRY_HOSTNAME: eu.gcr.io/${{ secrets.PROJECT_SHARED }}
+
+jobs:
+  lint:
+    name: Lint
+    # Run only if the event is a pull request and it's not a protected branch
+    if: github.event_name == 'pull_request' && !(contains([develop,qa,uat,prod], ${GITHUB_REF##*/}))
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: ENV
+        run: env
+      # Setup Go
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.4' # The Go version to download (if necessary) and use.
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out code
+        uses: actions/checkout@v2
+      # Set credentials to get zebra library
+      - name: Setup credentials to access private repo
+        run: git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      # Run fmt of code
+      - name: check formatting
+        run: make fmt-check
+      # Run vet & lint on the code
+      - name: Run code vet
+        run: make vet
+      # Run vet & lint on the code
+      - name: Run code lint
+        run: make lint
+
+  test:
+    name: Test
+    # Run only if the event is a pull request and it's not a protected branch
+    if: github.event_name == 'pull_request' && !(contains([develop,qa,uat,prod], ${GITHUB_REF##*/}))
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [lint] # Only run this workflow when "lint" workflow succeeds
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Setup Go
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.4' # The Go version to download (if necessary) and use.
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out code
+        uses: actions/checkout@v2
+      # Set credentials to get zebra library
+      - name: Setup credentials to access private repo
+        run: git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      # Run unit tests + coverage
+      - name: Run unit tests
+        run: make test
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    # Run only if the event is a pull request and it's not a protected branch
+    if: github.event_name == 'pull_request' && !(contains([develop,qa,uat,prod], ${GITHUB_REF##*/}))
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.4' # The Go version to download (if necessary) and use.
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+        # Set credentials to get zebra library
+      - name: Setup credentials to access private repo
+        run: git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      - name: Generate test cover report
+        run:  go test -race -covermode=atomic -coverprofile=coverage.out -json ./... > report.json
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build:
+    name: Build
+    # Run only if the event is a push to a protected branch
+    if: github.event_name == 'push' && contains([develop,qa,uat,prod], ${GITHUB_REF##*/})
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Setup Go
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.4' # The Go version to download (if necessary) and use.
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Check out code
+        uses: actions/checkout@v2
+      # Set credentials to get zebra library
+      - name: Setup credentials to access private repo
+        run: git config --global url."https://${{ secrets.PAT }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+      # Run build of the application
+      - name: Run build
+        run: go build .
+
+  package:
+    name: Package (docker)
+    runs-on: ubuntu-latest
+    # Run only if the event is a push to a protected branch
+    if: github.event_name == 'push' && contains([develop,qa,uat,prod], ${GITHUB_REF##*/})
+    needs: [build] # Only run this workflow when "build" workflow succeeds
+
+    steps:
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::develop
+
+      - name: Get short commit id
+        id: vars
+        run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+
+      - name: Print version
+        run: |
+          echo [github.tag]: $VERSION
+          echo [github.sha]: ${{ github.sha }}
+          echo [github.ref]: ${{ github.ref }}
+          echo [github.actor]: trigered by $GITHUB_ACTOR
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          version: "290.0.1"
+          service_account_key: ${{ secrets.SA_SHARED }}
+          project_id: ${{ secrets.PROJECT_SHARED }}
+
+      - name: Configure docker
+        run: |
+          # Set up docker to authenticate
+          # via gcloud command-line tool.
+          gcloud auth configure-docker
+      # images name in format - [ORG]/[IMAGE] e.g. roava.io/myimage
+      - name: Build the Docker image
+        id: build
+        run: |
+          export TAG=`echo $VERSION`
+          export TAG2=`echo $VERSION-$(date +'%Y-%m-%d_%H-%M-%S')`
+          export CONTAINER=`echo $ORG/$IMAGE`
+          docker build -t "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG" \
+          -t "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG2" \
+          -t "$REGISTRY_HOSTNAME"/"$CONTAINER":"${GITHUB_SHA::8}" \
+          -t "$REGISTRY_HOSTNAME"/"$CONTAINER":"$GITHUB_SHA" \
+            --build-arg GITHUB_SHA="$GITHUB_SHA" \
+            --build-arg ACCESS_TOKEN="${{ secrets.PAT }}" \
+            --build-arg GITHUB_REF="$GITHUB_REF" .
+          docker tag "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG" "$REGISTRY_HOSTNAME"/"$CONTAINER":latest
+          docker tag "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG2" "$REGISTRY_HOSTNAME"/"$CONTAINER":latest
+          docker push "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG"
+          docker push "$REGISTRY_HOSTNAME"/"$CONTAINER":"$TAG2"
+          docker push "$REGISTRY_HOSTNAME"/"$CONTAINER":latest
+
+  deploy:
+    name: Deploy to QA-Y
+    runs-on: [self-hosted, linux, x64, dev]
+    # Run only if the event is a push to a protected branch
+    if: github.event_name == 'push' && contains([develop,qa,uat,prod], ${GITHUB_REF##*/})
+    needs: [package]
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+      
+      - id: auth
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          credentials_json: '${{ secrets.SV_ACCOUNT_DEV }}'
+
+      - id: get-credentials
+        uses: 'google-github-actions/get-gke-credentials@v0.4.0'
+        with:
+          cluster_name: 'services-cluster'
+          use_internal_ip: true
+          location: 'europe-west2-a'
+      
+      - name: helm update
+        run : helm repo update
+      
+      - name: Deploy
+        run : |
+          SERVICE=`echo ${{github.event.repository.name}} | sed 's/\./-/g'`
+          helm upgrade --install $SERVICE roava/deployment-template --force --set deployment.version=${VERSION} --values kubernetes/dev-values.yml
+      
+      - name: restarting pod
+        run : |
+          SERVICE=`echo ${{github.event.repository.name}} | sed 's/\./-/g'`
+          kubectl rollout restart deployment $SERVICE

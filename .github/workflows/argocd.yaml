@@ -1,0 +1,50 @@
+name: ArgoCD
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          dev:
+            - 'environments/dev/**'
+          prod:
+            - 'environments/prod/**'
+
+  # JOB to deploy dev
+  dev:
+    container:
+      image: kubectl:1.24
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          kubectl apply -k roava-dev/
+
+  # JOB to deploy prod
+  prod:
+    container:
+        image: kubectl:1.24
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          kubectl apply -k roava-prod/
+
