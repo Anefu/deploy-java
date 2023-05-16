@@ -19,15 +19,13 @@ jobs:
           ssh-key: ${{ secrets.DEST_SSH_KEY }}
 
       - name: Create tag in source repo
-        uses: rickstaa/action-create-tag@v1
-        id: "tag_create"
-        with:
-          tag: "v1.0"
-          tag_exists_error: true
-          message: "release 1.0"
+        run: |
+          git tag -a v1.0 -m "test tag"
+          git push origin v1.0
 
       - name: Add remote
         run: |
+          cd php-todo
           git remote add source ${{ github.repository }}
           git fetch source --tags
 
