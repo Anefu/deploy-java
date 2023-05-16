@@ -33,8 +33,9 @@ jobs:
 
       - name: Sync directories
         run: |
+          cd deploy-java
           git fetch --tags
-          rsync -a --exclude='*.yml' ./deploy-java ./php-todo
+          rsync -a --exclude='*.yml' ./ ./php-todo
       
       - name: Create commit and push
         run: |
