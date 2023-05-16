@@ -20,6 +20,8 @@ jobs:
 
       - name: Create tag in source repo
         run: |
+          git config --global user.email "test@gmail.com"
+          git config --global user.name "praise"
           git tag -a v1.0 -m "test tag"
           git push origin v1.0
 
