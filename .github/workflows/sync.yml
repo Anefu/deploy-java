@@ -12,12 +12,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Checkout dest repo
-        uses: actions/checkout@v3
-        with:
-          repository: Anefu/php-todo
-          ssh-key: ${{ secrets.DEST_SSH_KEY }}
-          path: ./php-todo
+      # - name: Checkout dest repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: Anefu/php-todo
+      #     ssh-key: ${{ secrets.DEST_SSH_KEY }}
+      #     path: ./php-todo
 
       - name: Create tag in source repo
         run: |
@@ -26,14 +26,13 @@ jobs:
           git tag -a v1.0 -m "test tag"
           git push origin v1.0
 
-      - name: Add remote
+      - name: Add destination remote
         run: |
-          cd php-todo
-          git remote add source ${{ github.repository }}
-          git fetch source --tags
+          git remote add dest https://github.com/Anefu/php-todo.git
+          git fetch --tags
 
       - name: Push to remote repo
         run: |
-          git checkout master
-          git merge source/v1.0
-          git push origin master
+          git checkout dest/main
+          git merge v1.0
+          git push dest main
