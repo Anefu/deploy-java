@@ -36,7 +36,7 @@ jobs:
           cd deploy-java
           git fetch --tags
           git checkout v1.0
-          rsync -av --exclude='**/.git' --exclude='**/*.yml' ./ ../php-todo
+          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/
       
       - name: Create commit and push
         run: |
