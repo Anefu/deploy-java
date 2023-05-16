@@ -12,6 +12,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup SSH key for destination repo
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+            ssh-private-key: ${{ secrets.DEST_SSH_KEY }}
+
       # - name: Checkout dest repo
       #   uses: actions/checkout@v3
       #   with:
@@ -24,11 +29,11 @@ jobs:
           git config user.email "test@gmail.com"
           git config user.name "praise"
           git tag -a v1.0 -m "test tag"
-          git push origin v1.0
+          git push origin v1.$(( $RANDOM % 10 ))
 
       - name: Add destination remote
         run: |
-          git remote add dest https://github.com/Anefu/php-todo.git
+          git remote add dest git@github.com/Anefu/php-todo.git
           git fetch --tags
 
       - name: Push to remote repo
