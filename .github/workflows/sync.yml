@@ -28,13 +28,16 @@ jobs:
           export TAG=$(( $RANDOM % 10 ))
           git config user.email "test@gmail.com"
           git config user.name "praise"
+          echo "Create Tag and push"
           git tag -a $TAG -m "test tag"
           git push origin $TAG
 
       - name: Sync directories
         run: |
           cd deploy-java
+          echo "Fetching Tags"
           git fetch --tags
+          echo "Checkout recent tag"
           git checkout $TAG
           rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/
       
@@ -43,6 +46,8 @@ jobs:
           cd ./php-todo
           git config user.email "test@gmail.com"
           git config user.name "praise"
+          echo "Add changes, if any"
           git add .
+          "Commit changes if any or exit"
           git commit -m "test sync" || exit 0
           git push origin main
