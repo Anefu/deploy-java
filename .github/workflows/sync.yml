@@ -21,7 +21,7 @@ jobs:
       - name: Checkout dest repo
         uses: actions/checkout@v3
         with:
-          repository: DEST_REPO
+          repository: $DEST_REPO
           ssh-key: ${{ secrets.DEST_SSH_KEY }}
           path: ./${DEST_REPO##*/}
           ref: main
