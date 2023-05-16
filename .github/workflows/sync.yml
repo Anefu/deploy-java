@@ -45,11 +45,5 @@ jobs:
           git config user.email "test@gmail.com"
           git config user.name "praise"
           git add .
-          git commit -m "test sync"
-          if [ $? -ne 0 ] 
-          then
-              echo "Nothing to commit, exiting..."
-              exit 0
-          else
-            git push origin main
-          fi
+          git commit -m "test sync" || exit 0
+          git push origin main
