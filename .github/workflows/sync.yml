@@ -11,33 +11,32 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Setup SSH key for destination repo
-        uses: webfactory/ssh-agent@v0.7.0
         with:
-            ssh-private-key: ${{ secrets.DEST_SSH_KEY }}
+          path: ./deploy-java
 
-      # - name: Checkout dest repo
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: Anefu/php-todo
-      #     ssh-key: ${{ secrets.DEST_SSH_KEY }}
-      #     path: ./php-todo
+      - name: Checkout dest repo
+        uses: actions/checkout@v3
+        with:
+          repository: Anefu/php-todo
+          ssh-key: ${{ secrets.DEST_SSH_KEY }}
+          path: ./php-todo
+          ref: main
 
       - name: Create tag in source repo
         run: |
+          cd deploy-java
+          echo TAG=$(( $RANDOM % 10 ))
           git config user.email "test@gmail.com"
           git config user.name "praise"
-          git tag -a v1.0 -m "test tag"
-          git push origin v1.$(( $RANDOM % 10 ))
+          git tag -a $TAG -m "test tag"
+          git push origin $TAG
 
-      - name: Add destination remote
+      - name: Sync directories
         run: |
-          git remote add dest git@github.com/Anefu/php-todo.git
           git fetch --tags
-
-      - name: Push to remote repo
+          rsync -a --exclude='*.yml' ./deploy-java ./php-todo
+      
+      - name: Create commit and push
         run: |
-          git checkout dest/main
-          git merge v1.0
-          git push dest main
+          git commit -am "test sync"
+          git push
