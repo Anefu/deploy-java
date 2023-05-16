@@ -17,11 +17,12 @@ jobs:
         with:
           repository: Anefu/php-todo
           ssh-key: ${{ secrets.DEST_SSH_KEY }}
+          path: ./php-todo
 
       - name: Create tag in source repo
         run: |
-          git config --global user.email "test@gmail.com"
-          git config --global user.name "praise"
+          git config user.email "test@gmail.com"
+          git config user.name "praise"
           git tag -a v1.0 -m "test tag"
           git push origin v1.0
 
