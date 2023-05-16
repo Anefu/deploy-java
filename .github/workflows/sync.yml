@@ -43,5 +43,6 @@ jobs:
           cd ./php-todo
           git config user.email "test@gmail.com"
           git config user.name "praise"
-          git commit -am "test sync"
+          git add .
+          git commit -m "test sync"
           git push origin HEAD:main
