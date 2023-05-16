@@ -41,7 +41,6 @@ jobs:
       - name: Create commit and push
         run: |
           cd ./php-todo
-          git checkout main
           git config user.email "test@gmail.com"
           git config user.name "praise"
           git add .
