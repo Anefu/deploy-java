@@ -4,6 +4,10 @@ on:
     branches:
       - dev
 
+env:
+  SRC_REPO: ./
+  DEST_REPO: Anefu/php-todo
+
 jobs:
   Sync:
     name: "Sync Repos"
@@ -17,9 +21,9 @@ jobs:
       - name: Checkout dest repo
         uses: actions/checkout@v3
         with:
-          repository: Anefu/php-todo
+          repository: DEST_REPO
           ssh-key: ${{ secrets.DEST_SSH_KEY }}
-          path: ./php-todo
+          path: ./${DEST_REPO##*/}
           ref: main
 
       - name: Create tag in source repo
@@ -36,11 +40,11 @@ jobs:
           cd deploy-java
           git fetch --tags
           git checkout v1.0
-          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/
+          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../${DEST_REPO##*/}
       
       - name: Create commit and push
         run: |
-          cd ./php-todo
+          cd ./${DEST_REPO##*/}
           git checkout main
           git config user.email "test@gmail.com"
           git config user.name "praise"
