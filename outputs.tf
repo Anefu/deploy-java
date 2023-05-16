@@ -8,4 +8,4 @@ output "bastion" {
 
 output "instances" {
   value = module.infra.instances
-}
+} 
