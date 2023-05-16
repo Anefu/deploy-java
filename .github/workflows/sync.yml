@@ -41,8 +41,15 @@ jobs:
       - name: Create commit and push
         run: |
           cd ./php-todo
+          git checkout main
           git config user.email "test@gmail.com"
           git config user.name "praise"
           git add .
           git commit -m "test sync"
-          git push origin HEAD:main
+          if [ $? -ne 0 ] 
+          then
+              echo "Nothing to commit, exiting..."
+              exit 0
+          else
+            git push origin main
+          fi
