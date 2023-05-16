@@ -1,0 +1,38 @@
+name: Sync Repos
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  Sync:
+    name: "Sync Repos"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Checkout dest repo
+        uses: actions/checkout@v3
+        with:
+          repository: Anefu/php-todo
+          ssh-key: ${{ secrets.DEST_SSH_KEY }}
+
+      - name: Create tag in source repo
+        uses: rickstaa/action-create-tag@v1
+        id: "create_tag"
+        with:
+          tag: "v1.0"
+          tag_exists_error: true
+          message: "release 1.0"
+
+      - name: Add remote
+        run: |
+          git remote add source ${{ github.repository }}
+          git fetch source --tags
+
+      - name: Push to remote repo
+        run: |
+          git checkout master
+          git merge source/v1.0
+          git push origin master
