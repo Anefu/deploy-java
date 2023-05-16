@@ -48,6 +48,6 @@ jobs:
           git config user.name "praise"
           echo "Add changes, if any"
           git add .
-          "Commit changes if any or exit"
+          echo "Commit changes if any or exit"
           git commit -m "test sync" || exit 0
           git push origin main
