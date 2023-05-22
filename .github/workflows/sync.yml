@@ -2,8 +2,15 @@ name: Sync Repos
 on:
   push:
     branches:
-      - dev
-
+      - dev # change
+  # for manual deployments
+  workflow_dispatch: 
+    inputs:
+      tag:
+        description: 'Tag to create'
+        required: true
+        type: string
+      
 jobs:
   Sync:
     name: "Sync Repos"
@@ -12,40 +19,61 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          path: ./deploy-java
+          path: ./deploy-java # change
 
       - name: Checkout dest repo
         uses: actions/checkout@v3
         with:
-          repository: Anefu/php-todo
-          ssh-key: ${{ secrets.DEST_SSH_KEY }}
-          path: ./php-todo
-          ref: main
+          repository: Anefu/php-todo # change
+          ssh-key: ${{ secrets.DEST_SSH_KEY }} # change
+          path: ./php-todo # change
+          ref: main # change
+
+      - name: Set tag
+        run: |
+          if [ -n $${{ inputs.tag }} ]
+          then
+            CURTAG=`git describe --abbrev=0 --tags`;
+            CURTAG="${CURTAG/v/}"
+            
+            IFS='.' read -a vers <<< "$CURTAG"
+            
+            MAJ=${vers[0]}
+            MIN=${vers[1]}
+
+            ((MIN+=1))
+
+            export TAG="v$MAJ.$MIN"
+            echo $TAG
+          else
+            export TAG=${{ inputs.tag }}
+            echo $TAG
+          fi
+
 
       - name: Create tag in source repo
         run: |
-          cd deploy-java
-          export TAG=$(( $RANDOM % 10 ))
-          git config user.email "test@gmail.com"
-          git config user.name "praise"
+          cd deploy-java # change
+          git config user.email "test@gmail.com" # change
+          git config user.name "praise" # change
           echo "Create Tag and push"
           git tag -a $TAG -m "test tag"
           git push origin $TAG
 
       - name: Sync directories
         run: |
-          cd deploy-java
+          cd deploy-java # change
           echo "Fetching Tags"
           git fetch --tags
           echo "Checkout recent tag"
           git checkout $TAG
-          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/
+          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/ # change, specify paths to exclude
       
       - name: Create commit and push
         run: |
-          cd ./php-todo
-          git config user.email "test@gmail.com"
-          git config user.name "praise"
+          cd ./php-todo # change
+          git config user.email "test@gmail.com" # change
+          git config user.name "praise" # change
           echo "Add changes, if any"
           git add .
           echo "Commit changes if any or exit"
