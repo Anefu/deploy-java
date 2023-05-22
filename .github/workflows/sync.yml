@@ -35,7 +35,7 @@ jobs:
           if [ -n $${{ inputs.tag }} ]
           then
             git fetch --tags
-            CURTAG=`git describe $GITHUB_REF_NAME --match "v*" --tags | cut -d"-" -f1`;
+            CURTAG=`git describe dev --match "v*" --tags | cut -d"-" -f1`;
             echo "Current tag: $CURTAG"
             CURTAG="${CURTAG/v/}"
             
