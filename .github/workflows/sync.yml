@@ -32,7 +32,7 @@ jobs:
       - name: Set tag
         run: |
           cd ./deploy-java
-          if [ $${{ inputs.tag }} == "" ]
+          if [ ${{ inputs.tag }} == "" ]
           then
             set -eux
             git fetch --unshallow
