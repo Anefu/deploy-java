@@ -55,6 +55,7 @@ jobs:
 
       - name: Create tag in source repo
         run: |
+          echo ${{ github.event_name }}
           cd deploy-java # change
           git config user.email "test@gmail.com" # change
           git config user.name "praise" # change
