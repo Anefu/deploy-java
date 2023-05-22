@@ -35,29 +35,22 @@ jobs:
         if: env.TAG == null
         run: |
           cd ./deploy-java
-          echo ${{ inputs.tag }}
-          if [ -n ${{ inputs.tag }} ]
-          then
-            set -eux
-            git fetch --unshallow
-            git checkout $GITHUB_REF_NAME
-            CURTAG=`git describe --match "v*" --tags | cut -d"-" -f1`;
-            echo "Current tag: $CURTAG"
-            CURTAG="${CURTAG/v/}"
-            
-            IFS='.' read -a vers <<< "$CURTAG"
-            
-            MAJ=${vers[0]}
-            MIN=${vers[1]}
+          set -eux
+          git fetch --unshallow
+          git checkout $GITHUB_REF_NAME
+          CURTAG=`git describe --match "v*" --tags | cut -d"-" -f1`;
+          echo "Current tag: $CURTAG"
+          CURTAG="${CURTAG/v/}"
+          
+          IFS='.' read -a vers <<< "$CURTAG"
+          
+          MAJ=${vers[0]}
+          MIN=${vers[1]}
 
-            ((MIN+=1))
+          ((MIN+=1))
 
-            export TAG="v$MAJ.$MIN"
-            echo $TAG
-          else
-            export TAG=${{ inputs.tag }}
-            echo $TAG
-          fi
+          export TAG="v$MAJ.$MIN"
+          echo $TAG
 
 
       - name: Create tag in source repo
@@ -67,7 +60,7 @@ jobs:
           git config user.name "praise" # change
           echo "Create Tag and push"
           git tag -a $TAG -m "test tag"
-          git push origin $TAG
+          git push -f origin $TAG
 
       - name: Sync directories
         run: |
