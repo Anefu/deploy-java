@@ -32,7 +32,7 @@ jobs:
           ref: main # change
 
       - name: Set tag
-        if: ${{ inputs.tag }} == ""
+        if: env.TAG == null
         run: |
           cd ./deploy-java
           echo ${{ inputs.tag }}
