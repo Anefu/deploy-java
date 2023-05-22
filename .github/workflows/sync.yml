@@ -34,6 +34,7 @@ jobs:
           cd ./deploy-java
           if [ -n $${{ inputs.tag }} ]
           then
+            git fetch --tags
             CURTAG=`git describe --match "v*" --tags | cut -d"-" -f1`;
             echo "Current tag: $CURTAG"
             CURTAG="${CURTAG/v/}"
