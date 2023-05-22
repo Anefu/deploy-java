@@ -1,0 +1,84 @@
+name: Sync Repos
+on:
+  push:
+    branches:
+      - dev # change
+  # for manual deployments
+  workflow_dispatch: 
+    inputs:
+      tag:
+        description: 'Tag to create'
+        required: true
+        type: string
+      
+jobs:
+  Sync:
+    name: "Sync Repos"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          path: ./deploy-java # change
+
+      - name: Checkout dest repo
+        uses: actions/checkout@v3
+        with:
+          repository: Anefu/php-todo # change
+          ssh-key: ${{ secrets.DEST_SSH_KEY }} # change
+          path: ./php-todo # change
+          ref: main # change
+
+      - name: Set tag
+        run: |
+          cd ./deploy-java
+          if [ -n $${{ inputs.tag }} ]
+          then
+            git fetch --tags
+            CURTAG=`git describe $GITHUB_REF_NAME --match "v*" --tags | cut -d"-" -f1`;
+            echo "Current tag: $CURTAG"
+            CURTAG="${CURTAG/v/}"
+            
+            IFS='.' read -a vers <<< "$CURTAG"
+            
+            MAJ=${vers[0]}
+            MIN=${vers[1]}
+
+            ((MIN+=1))
+
+            export TAG="v$MAJ.$MIN"
+            echo $TAG
+          else
+            export TAG=${{ inputs.tag }}
+            echo $TAG
+          fi
+
+
+      - name: Create tag in source repo
+        run: |
+          cd deploy-java # change
+          git config user.email "test@gmail.com" # change
+          git config user.name "praise" # change
+          echo "Create Tag and push"
+          git tag -a $TAG -m "test tag"
+          git push origin $TAG
+
+      - name: Sync directories
+        run: |
+          cd deploy-java # change
+          echo "Fetching Tags"
+          git fetch --tags
+          echo "Checkout recent tag"
+          git checkout $TAG
+          rsync -av --exclude='**/.git*' --exclude='**/*.yml' ./ ../php-todo/ # change, specify paths to exclude
+      
+      - name: Create commit and push
+        run: |
+          cd ./php-todo # change
+          git config user.email "test@gmail.com" # change
+          git config user.name "praise" # change
+          echo "Add changes, if any"
+          git add .
+          echo "Commit changes if any or exit"
+          git commit -m "test sync" || exit 0
+          git push origin main
