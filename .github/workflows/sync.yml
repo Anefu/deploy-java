@@ -49,7 +49,7 @@ jobs:
 
           ((MIN+=1))
 
-          export TAG="v$MAJ.$MIN"
+          echo "TAG=v$MAJ.$MIN" >> $GITHUB_ENV
           echo "Current: $TAG"
 
       - name: Create tag in source repo
