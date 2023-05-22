@@ -34,6 +34,7 @@ jobs:
       - name: Set tag
         if: env.TAG == null
         run: |
+          echo ${{ github.event_name }}
           cd ./deploy-java
           set -eux
           git fetch --unshallow
@@ -50,7 +51,7 @@ jobs:
           ((MIN+=1))
 
           echo "TAG=v$MAJ.$MIN" >> $GITHUB_ENV
-          echo "Current: $TAG"
+          echo "Current: v$MAJ.$MIN"
 
       - name: Create tag in source repo
         run: |
