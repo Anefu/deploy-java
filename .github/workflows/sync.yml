@@ -27,7 +27,7 @@ jobs:
           cd ./deploy-java
           set -eux
           git fetch --unshallow
-          git checkout $GITHUB_REF_NAME
+          git describe --match "v*" --tags
           CURTAG=`git describe --match "v*" --tags | sort -u | cut -d"-" -f1`;
           echo "Current tag: $CURTAG"
           CURTAG="${CURTAG/v/}"
