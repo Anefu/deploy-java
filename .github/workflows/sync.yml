@@ -28,7 +28,7 @@ jobs:
           set -eux
           git fetch --unshallow
           git checkout $GITHUB_REF_NAME
-          CURTAG=`git describe --match "v*" --tags | cut -d"-" -f1`;
+          CURTAG=`git describe --match "v*" --tags | sort -u | cut -d"-" -f1`;
           echo "Current tag: $CURTAG"
           CURTAG="${CURTAG/v/}"
           
