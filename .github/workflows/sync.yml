@@ -62,7 +62,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          path: ./deploy-java # change
+          path: ./deploy-java
+          ref: refs/tags/$TAG # change
 
       - name: Checkout dest repo
         uses: actions/checkout@v3
