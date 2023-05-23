@@ -12,27 +12,16 @@ on:
         type: string
       
 jobs:
-  Sync:
-    name: "Sync Repos"
+  Tag:
+    name: "Create Tag"
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           path: ./deploy-java # change
 
-      - name: Checkout dest repo
-        uses: actions/checkout@v3
-        with:
-          repository: Anefu/php-todo # change
-          ssh-key: ${{ secrets.DEST_SSH_KEY }} # change
-          path: ./php-todo # change
-          ref: main # change
-
       - name: Set tag
-        if: env.TAG == null
         run: |
           echo ${{ github.event_name }}
           cd ./deploy-java
@@ -55,7 +44,6 @@ jobs:
 
       - name: Create tag in source repo
         run: |
-          echo ${{ github.event_name }}
           cd deploy-java # change
           git config user.email "test@gmail.com" # change
           git config user.name "praise" # change
@@ -63,6 +51,26 @@ jobs:
           echo "Create Tag and push"
           git tag -a $TAG -m "test tag"
           git push -f origin $TAG
+          
+  Sync:
+    name: "Sync Repos"
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          path: ./deploy-java # change
+
+      - name: Checkout dest repo
+        uses: actions/checkout@v3
+        with:
+          repository: Anefu/php-todo # change
+          ssh-key: ${{ secrets.DEST_SSH_KEY }} # change
+          path: ./php-todo # change
+          ref: main # change
 
       - name: Sync directories
         run: |
