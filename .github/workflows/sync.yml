@@ -5,11 +5,6 @@ on:
       - dev # change
   # for manual deployments
   workflow_dispatch: 
-    inputs:
-      tag:
-        description: 'Specify tag to create'
-        required: true
-        type: string
       
 jobs:
   Tag:
@@ -56,14 +51,11 @@ jobs:
     name: "Sync Repos"
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' }}
-    env:
-      TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           path: ./deploy-java
-          ref: ${{ env.TAG }} # change
 
       - name: Checkout dest repo
         uses: actions/checkout@v3
