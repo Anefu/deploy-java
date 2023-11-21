@@ -1,0 +1,34 @@
+name: GitOps
+
+on:
+  push:
+    branches:
+      - prod
+  workflow_dispatch:
+    inputs:
+      CLUSTER:
+        description: what cluster to deploy to?
+        required: true
+      APP:
+        type: choice
+        description: Pick the application to deploy
+        required: true
+        options:
+          - "onboarding"
+          - "message"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    container:
+      image: bitnami/kubectl:1.24
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Update variable
+        run: |
+          echo ${{ inputs.APP || 'yes' }}
+
+      - name: Apply appset
+        run: |
+          kubectl apply -f appsets/ms.${{ github.event.inputs.APP }}.yaml

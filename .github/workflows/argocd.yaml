@@ -3,9 +3,9 @@ name: ArgoCD
 on:
   push:
     branches:
-      - prod
-    paths:
-      - "environments/**"
+      - main
+    # paths:
+    #   - "environments/**"
 
 jobs:
   # JOB to run change detection
@@ -22,9 +22,9 @@ jobs:
       with:
         filters: |
           dev:
-            - 'environments/dev/**'
+            - 'roava-dev/**'
           prod:
-            - 'environments/prod/**'
+            - 'roava-prod/**'
 
   # JOB to deploy dev
   dev:
@@ -49,4 +49,3 @@ jobs:
       - uses: actions/checkout@v2
       - run: |
           kubectl apply -k roava-prod/
-
