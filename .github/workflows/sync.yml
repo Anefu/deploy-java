@@ -13,7 +13,6 @@ jobs:
   Tag:
     name: "Create Tag"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
