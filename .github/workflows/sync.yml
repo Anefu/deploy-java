@@ -4,7 +4,10 @@ on:
     branches:
       - dev # change
   # for manual deployments
-  workflow_dispatch: 
+  workflow_dispatch:
+    inputs:
+      APP:
+        required: false
       
 jobs:
   Tag:
@@ -19,23 +22,7 @@ jobs:
 
       - name: Set tag
         run: |
-          cd ./deploy-java
-          set -eux
-          git fetch --unshallow
-          git describe --abbrev=0 --match "v*" --tags
-          CURTAG=`git describe --match "v*" --tags | sort -u | cut -d"-" -f1`;
-          echo "Current tag: $CURTAG"
-          CURTAG="${CURTAG/v/}"
-          
-          IFS='.' read -a vers <<< "$CURTAG"
-          
-          MAJ=${vers[0]}
-          MIN=${vers[1]}
-
-          ((MIN+=1))
-
-          echo "TAG=v$MAJ.$MIN" >> $GITHUB_ENV
-          echo "Current: v$MAJ.$MIN"
+          echo ${{ inputs.APP || 'yes' }}
 
       - name: Create tag in source repo
         run: |
